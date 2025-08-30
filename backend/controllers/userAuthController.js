@@ -153,7 +153,7 @@ class authController {
                     expiresIn: '1d', // Token expiration time
                 });
 
-                const frontendUrl = process.env.FRONTEND_URL || 'https://smriti-jha-userdashboard.onrender.com';
+                const frontendUrl = process.env.FRONTEND_URL || 'https://smriti-jha-userdashboard-gh9m.onrender.com';
                 const verificationLink = `${frontendUrl}/loginstuff/verify-email?token=${verificationToken}`;
 
                 // Sending confirmation email

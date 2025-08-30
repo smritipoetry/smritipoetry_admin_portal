@@ -25,7 +25,7 @@ const Login = () => {
     e.preventDefault();
     try {
       setLoader(true);
-      const { data } = await axios.post(`${base_url}/api/login`, state);
+      const { data } = await axios.post(`${base_url}/login`, state);
       setLoader(false);
       localStorage.setItem("poetryToken", data.token);
       toast.success(data.message);
