@@ -18,8 +18,8 @@ app.use(bodyParser.json());
 // CORS Handling
 const corsOptions = {
     origin: [
-        "https://smriti-s-echo-admin-pq1n.vercel.app",
-        "https://smriti-jha-userdashboard.onrender.com",
+        "https://smritipoetry-admin-portal.vercel.app",
+        "https://smriti-jha-userdashboard-gh9m.onrender.com",
         "http://localhost:3000"
     ],
     credentials: true,
