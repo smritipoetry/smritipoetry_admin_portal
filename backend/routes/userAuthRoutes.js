@@ -10,6 +10,9 @@ router.post("/api/user-signup", authController.user_signup);
 
 
 router.post("/api/user-login", authController.user_login);
+router.post("/api/forgot-password", authController.forgot_password);
+router.post("/api/reset-password", authController.reset_password);
+
 
 router.post('/api/check-user', authController.check_user);
 router.get("/api/verify-email", authController.verify_email);

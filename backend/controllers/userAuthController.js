@@ -264,6 +264,94 @@ class authController {
     };
 
 
+    // Forgot Password - Send Reset Email
+    forgot_password = async (req, res) => {
+        try {
+            const { email } = req.body;
+
+            if (!email) {
+                return res.status(400).json({ success: false, message: "Email is required" });
+            }
+
+            const user = await authModel.findOne({ email });
+            if (!user) {
+                return res.status(404).json({ success: false, message: "User not found" });
+            }
+
+            // Generate reset token (valid for 15 minutes)
+            const resetToken = jwt.sign({ userId: user._id }, process.env.secret, { expiresIn: "15m" });
+
+            const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
+            const resetLink = `${frontendUrl}/loginstuff/reset-password?token=${resetToken}`;
+
+            // Email content
+            const mailOptions = {
+                from: process.env.MY_EMAIL,
+                to: email,
+                subject: "Password Reset Request - Smriti's Echoes",
+                text: `Hi ${user.fullName},\n\nYou requested to reset your password. Please use the link below to set a new password:\n\n${resetLink}\n\nThis link is valid for 15 minutes.`,
+                html: `<p>Hi <strong>${user.fullName}</strong>,</p><p>You requested to reset your password. Please use the link below:</p><p><a href="${resetLink}">Reset Password</a></p><p>This link will expire in 15 minutes.</p>`
+            };
+
+            transporter.sendMail(mailOptions, (error, info) => {
+                if (error) {
+                    console.error("Error sending reset email:", error);
+                    return res.status(500).json({ success: false, message: "Failed to send reset email" });
+                }
+                console.log("Reset email sent:", info.response);
+            });
+
+            res.status(200).json({
+                success: true,
+                message: "Password reset link sent to your email",
+                token: resetToken // optional, mainly for testing
+            });
+
+        } catch (error) {
+            console.error("Forgot Password Error:", error);
+            return res.status(500).json({ success: false, message: "Internal server error" });
+        }
+    };
+
+
+    // Reset Password - Verify Token & Update Password
+    reset_password = async (req, res) => {
+        try {
+            const { token, newPassword } = req.body;
+
+            if (!token || !newPassword) {
+                return res.status(400).json({ success: false, message: "Token and newPassword are required" });
+            }
+
+            // Verify token
+            let decoded;
+            try {
+                decoded = jwt.verify(token, process.env.secret);
+            } catch (err) {
+                return res.status(400).json({ success: false, message: "Invalid or expired token" });
+            }
+
+            // Find user
+            const user = await authModel.findById(decoded.userId);
+            if (!user) {
+                return res.status(404).json({ success: false, message: "User not found" });
+            }
+
+            // Hash new password
+            const hashedPassword = await bcrypt.hash(newPassword, 10);
+            user.password = hashedPassword;
+            await user.save();
+
+            res.status(200).json({ success: true, message: "Password reset successful! You can now log in." });
+
+        } catch (error) {
+            console.error("Reset Password Error:", error);
+            return res.status(500).json({ success: false, message: "Internal server error" });
+        }
+    };
+
+
+
 
     // ✅ Check User Controller
     check_user = async (req, res) => {
