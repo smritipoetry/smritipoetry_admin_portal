@@ -582,6 +582,48 @@ class authController {
         res.clearCookie("token");
         res.status(200).json({ success: true, message: "Logged out successfully" });
     };
+
+    // ✅ Permanently Delete User Account
+    delete_account = async (req, res) => {
+        try {
+            const userId = req.userId; // Extracted from your auth middleware
+
+            if (!userId) {
+                return res.status(400).json({ success: false, message: "User ID missing" });
+            }
+
+            const user = await authModel.findById(userId);
+            if (!user) {
+                return res.status(404).json({ success: false, message: "User not found" });
+            }
+
+            // ✅ Optional: delete profile picture from Cloudinary if not default avatar
+            if (user.profilePicture && !user.profilePicture.includes("flaticon.com")) {
+                try {
+                    const publicId = user.profilePicture.split("/").pop().split(".")[0];
+                    await cloudinary.uploader.destroy(`user_profiles/${publicId}`);
+                } catch (err) {
+                    console.warn("⚠️ Cloudinary deletion failed:", err.message);
+                }
+            }
+
+            // ✅ Optional: Delete all poems by this user
+            await poetryModel.deleteMany({ author: userId });
+
+            // ✅ Permanently delete user
+            await authModel.findByIdAndDelete(userId);
+
+            res.status(200).json({
+                success: true,
+                message: "Your account has been permanently deleted."
+            });
+
+        } catch (error) {
+            console.error("❌ Delete Account Error:", error);
+            return res.status(500).json({ success: false, message: "Server error" });
+        }
+    };
+
 }
 
 module.exports = new authController();
