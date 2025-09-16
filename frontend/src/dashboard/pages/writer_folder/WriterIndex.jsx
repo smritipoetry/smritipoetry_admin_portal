@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useContext } from "react";
 import { Link } from "react-router-dom";
-import storeContext from "../../context/storeContext";
+import storeContext from "../../../context/storeContext";
 
 const WriterIndex = () => {
   const { store } = useContext(storeContext);

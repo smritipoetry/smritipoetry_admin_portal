@@ -1,7 +1,7 @@
 import React, { useState, useContext } from "react";
 import axios from "axios";
-import { base_url } from "../../config/config";
-import storeContext from "../../context/storeContext";
+import { base_url } from "../../../config/config";
+import storeContext from "../../../context/storeContext";
 import toast from "react-hot-toast";
 import { MdCloudUpload } from "react-icons/md";
 import JoditEditor from "jodit-react";

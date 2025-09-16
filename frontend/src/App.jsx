@@ -1,21 +1,24 @@
 import React from "react";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import MainLayout from "./dashboard/layout/MainLayout";
-import AdminIndex from "./dashboard/pages/AdminIndex";
+import AdminIndex from "./dashboard/pages/admin_folder/AdminIndex";
 import Login from "./dashboard/pages/Login";
 import ProtectDashboard from "./middleware/protectDashboard";
 import ProtectRole from "./middleware/ProtectRole";
 import Unable from "./dashboard/pages/Unable";
-import AddWriter from "./dashboard/pages/AddWriter";
-import Writers from "./dashboard/pages/Writers";
-import Poetry from "./dashboard/pages/Poetry";
+import AddWriter from "./dashboard/pages/admin_folder/AddWriter";
+import Writers from "./dashboard/pages/admin_folder/Writers";
+import Poetry from "./dashboard/pages/admin_folder/Poetry";
 import Profile from "./dashboard/pages/Profile";
-import Writer from "./dashboard/pages/WriterIndex";
-import CreatePoetry from "./dashboard/pages/CreatePoetry";
-import CreatePoetryAdmin from "./dashboard/pages/CreatePoetryAdmin";
-import UserSubmittedPoetry from "./dashboard/pages/UserSubmittedPoetry";
+import Writer from "./dashboard/pages/writer_folder/WriterIndex";
+import CreatePoetry from "./dashboard/pages/writer_folder/CreatePoetry";
+import CreatePoetryAdmin from "./dashboard/pages/admin_folder/CreatePoetryAdmin";
+import UserSubmittedPoetry from "./dashboard/pages/admin_folder/UserSubmittedPoetry";
 import EditPoetry from "./dashboard/pages/Edit_poetry";
 import UserDashboard from "./dashboard/pages/userpage";
+import CreateBlog from "./dashboard/pages/blog_folder/AddBlog";
+import Blog from "./dashboard/pages/blog_folder/All_Blog";
+import Editblog from "./dashboard/pages/blog_folder/Edit_blog";
 
 function App() {
   const userInfo = {
@@ -61,6 +64,9 @@ function App() {
                 path="poetry/usersubmittedpoetry"
                 element={<UserSubmittedPoetry />}
               />
+              <Route path="blog/add" element={<CreateBlog />} />
+              <Route path="blog/edit/:blog_id" element={<Editblog />} />
+              <Route path="blog" element={<Blog />} />
             </Route>
 
             {/* Writer routes with role protection */}

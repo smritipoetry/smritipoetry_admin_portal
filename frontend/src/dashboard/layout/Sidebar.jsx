@@ -1,16 +1,17 @@
 import React, { useContext } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { AiFillDashboard, AiOutlinePlus } from "react-icons/ai";
-import { ImProfile } from "react-icons/im";
+import { AiFillDashboard } from "react-icons/ai";
 import { FiUsers } from "react-icons/fi";
 import { FaPlus, FaBook, FaPen, FaListAlt, FaUser } from "react-icons/fa";
+import { RiFileList2Fill } from "react-icons/ri";
+import { BiAddToQueue } from "react-icons/bi";
+import { MdLibraryBooks } from "react-icons/md";
 import { IoMdLogOut } from "react-icons/io";
 import storeContext from "../../context/storeContext";
 
 const Sidebar = () => {
   const navigate = useNavigate();
   const { pathname } = useLocation();
-
   const { store, dispatch } = useContext(storeContext);
 
   const logout = () => {
@@ -19,9 +20,17 @@ const Sidebar = () => {
     navigate("/login");
   };
 
+  const linkClass = (path) =>
+    `px-3 py-2 rounded-sm flex gap-x-2 items-center font-medium transition-colors ${
+      pathname === path
+        ? "bg-green-700 text-white"
+        : "bg-white text-[#404040f6]"
+    } hover:bg-green-700 hover:text-white`;
+
   return (
-    <div className="w-[250px] h-screen fixed left-0 top-0 bg-white">
-      <div className="h-[150px] flex justify-center items-center">
+    <div className="w-[250px] h-screen fixed left-0 top-0 bg-white border-r border-gray-200">
+      {/* Logo Section */}
+      <div className="h-[150px] flex justify-center items-center border-b border-gray-200">
         <Link to="/">
           <img
             src="/assets/mylogo.png"
@@ -30,83 +39,72 @@ const Sidebar = () => {
           />
         </Link>
       </div>
-      <ul className="px-3 flex flex-col gap-y-1 font-medium">
+
+      {/* Menu Section */}
+      <ul className="px-3 py-4 flex flex-col gap-y-2">
         {store.userInfo?.role === "admin" ? (
           <>
             <li>
               <Link
                 to="/dashboard/admin"
-                className={`px-3 ${
-                  pathname === "/dashboard/admin"
-                    ? "bg-green-700 text-white"
-                    : "bg-white text-[#404040f6]"
-                } py-2 hover:shadow-lg hover:shadow-indigo-5000/20 w-full rounded-sm flex gap-x-2 justify-start items-center hover:bg-green-700 hover:text-white`}
+                className={linkClass("/dashboard/admin")}
               >
-                <span className="text-xl">
-                  <AiFillDashboard />
-                </span>
+                <AiFillDashboard className="text-xl" />
                 <span>Dashboard</span>
               </Link>
             </li>
-
             <li>
               <Link
                 to="/dashboard/writer/add"
-                className={`px-3 ${
-                  pathname === "/dashboard/writer/add"
-                    ? "bg-green-700 text-white"
-                    : "bg-white text-[#404040f6]"
-                } py-2 hover:shadow-lg hover:shadow-indigo-5000/20 w-full rounded-sm flex gap-x-2 justify-start items-center hover:bg-green-700 hover:text-white`}
+                className={linkClass("/dashboard/writer/add")}
               >
-                <span className="text-xl">
-                  <AiOutlinePlus />
-                </span>
+                <BiAddToQueue className="text-xl" />
                 <span>Add Writer</span>
               </Link>
             </li>
-
             <li>
               <Link
                 to="/dashboard/writers"
-                className={`px-3 ${
-                  pathname === "/dashboard/writers"
-                    ? "bg-green-700 text-white"
-                    : "bg-white text-[#404040f6]"
-                } py-2 hover:shadow-lg hover:shadow-indigo-5000/20 w-full rounded-sm flex gap-x-2 justify-start items-center hover:bg-green-700 hover:text-white`}
+                className={linkClass("/dashboard/writers")}
               >
-                <span className="text-xl">
-                  <FiUsers />
-                </span>
+                <FiUsers className="text-xl" />
                 <span>Writers</span>
               </Link>
             </li>
             <li>
               <Link
-                to="/dashboard/poetry/usersubmittedpoetry"
-                className={`px-3 ${
-                  pathname === "/dashboard/poetry/usersubmittedpoetry"
-                    ? "bg-green-700 text-white"
-                    : "bg-white text-[#404040f6]"
-                } py-2 hover:shadow-lg hover:shadow-indigo-5000/20 w-full rounded-sm flex gap-x-2 justify-start items-center hover:bg-green-700 hover:text-white`}
+                to="/dashboard/blog/add"
+                className={linkClass("/dashboard/blog/add")}
               >
-                <span className="text-xl">
-                  <FaBook />
-                </span>
-                <span>User's poetry</span>
+                <FaPen className="text-xl" />
+                <span>Add Blog</span>
+              </Link>
+            </li>
+            <li>
+              <Link
+                to="/dashboard/blog"
+                className={linkClass("/dashboard/blog")}
+              >
+                <MdLibraryBooks className="text-xl" />
+                <span>All Blog</span>
+              </Link>
+            </li>
+
+            <li>
+              <Link
+                to="/dashboard/poetry/usersubmittedpoetry"
+                className={linkClass("/dashboard/poetry/usersubmittedpoetry")}
+              >
+                <RiFileList2Fill className="text-xl" />
+                <span>User's Poetry</span>
               </Link>
             </li>
             <li>
               <Link
                 to="/dashboard/poetry/createadmin"
-                className={`px-3 ${
-                  pathname === "/dashboard/poetry/createadmin"
-                    ? "bg-green-700 text-white"
-                    : "bg-white text-[#404040f6]"
-                } py-2 hover:shadow-lg hover:shadow-indigo-5000/20 w-full rounded-sm flex gap-x-2 justify-start items-center hover:bg-green-700 hover:text-white`}
+                className={linkClass("/dashboard/poetry/createadmin")}
               >
-                <span className="text-xl">
-                  <FaPen />
-                </span>
+                <FaPlus className="text-xl" />
                 <span>Add User's Poetry</span>
               </Link>
             </li>
@@ -116,77 +114,49 @@ const Sidebar = () => {
             <li>
               <Link
                 to="/dashboard/writer"
-                className={`px-3 ${
-                  pathname === "/dashboard/writer"
-                    ? "bg-green-700 text-white"
-                    : "bg-white text-[#404040f6]"
-                } py-2 hover:shadow-lg hover:shadow-indigo-5000/20 w-full rounded-sm flex gap-x-2 justify-start items-center hover:bg-green-700 hover:text-white`}
+                className={linkClass("/dashboard/writer")}
               >
-                <span className="text-xl">
-                  <AiFillDashboard />
-                </span>
+                <AiFillDashboard className="text-xl" />
                 <span>Dashboard</span>
               </Link>
             </li>
             <li>
               <Link
                 to="/dashboard/poetry/create"
-                className={`px-3 ${
-                  pathname === "/dashboard/poetry/create"
-                    ? "bg-green-700 text-white"
-                    : "bg-white text-[#404040f6]"
-                } py-2 hover:shadow-lg hover:shadow-indigo-5000/20 w-full rounded-sm flex gap-x-2 justify-start items-center hover:bg-green-700 hover:text-white`}
+                className={linkClass("/dashboard/poetry/create")}
               >
-                <span className="text-xl">
-                  <FaPlus />
-                </span>
+                <FaPen className="text-xl" />
                 <span>Add Poetry</span>
               </Link>
             </li>
           </>
         )}
 
-        {/* Common tabs for both admin and writer */}
+        {/* Common Tabs */}
         <li>
           <Link
             to="/dashboard/poetry"
-            className={`px-3 ${
-              pathname === "/dashboard/poetry"
-                ? "bg-green-700 text-white"
-                : "bg-white text-[#404040f6]"
-            } py-2 hover:shadow-lg hover:shadow-indigo-5000/20 w-full rounded-sm flex gap-x-2 justify-start items-center hover:bg-green-700 hover:text-white`}
+            className={linkClass("/dashboard/poetry")}
           >
-            <span className="text-xl">
-              <FaListAlt />
-            </span>
+            <FaBook className="text-xl" />
             <span>All Poetry</span>
           </Link>
         </li>
-
         <li>
           <Link
             to="/dashboard/profile"
-            className={`px-3 ${
-              pathname === "/dashboard/profile"
-                ? "bg-green-700 text-white"
-                : "bg-white text-[#404040f6]"
-            } py-2 hover:shadow-lg hover:shadow-indigo-5000/20 w-full rounded-sm flex gap-x-2 justify-start items-center hover:bg-green-700 hover:text-white`}
+            className={linkClass("/dashboard/profile")}
           >
-            <span className="text-xl">
-              <FaUser />
-            </span>
+            <FaUser className="text-xl" />
             <span>Profile</span>
           </Link>
         </li>
-
         <li>
           <div
             onClick={logout}
-            className={`px-3 py-2 hover:shadow-lg hover:shadow-indigo-5000/20 w-full rounded-sm flex gap-x-2 justify-start items-center hover:bg-red-500 hover:text-white cursor-pointer`}
+            className="px-3 py-2 rounded-sm flex gap-x-2 items-center font-medium cursor-pointer text-[#404040f6] hover:bg-red-500 hover:text-white transition-colors"
           >
-            <span className="text-xl">
-              <IoMdLogOut />
-            </span>
+            <IoMdLogOut className="text-xl" />
             <span>Logout</span>
           </div>
         </li>

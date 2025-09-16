@@ -20,7 +20,8 @@ const corsOptions = {
     origin: [
         "https://smritipoetry-admin-portal.vercel.app",
         "https://smriti-jha-userdashboard-gh9m.onrender.com",
-        "http://localhost:3000"
+        "http://localhost:3000",
+        "http://localhost:5173"
     ],
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
@@ -43,7 +44,7 @@ app.use('/', require('./routes/PoetryRoute'));
 app.use('/', require('./routes/querySubscribeRoute'));
 app.use('/', require('./routes/submitpoetryRoutes'));
 app.use('/', require('./routes/userAuthRoutes'));
-
+app.use('/', require('./routes/blogRoutes'));
 app.get('/', (req, res) => res.send('Hello World!'));
 
 // Connect DB

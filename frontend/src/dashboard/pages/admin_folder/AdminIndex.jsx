@@ -1,6 +1,6 @@
 import React, { useContext } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import storeContext from "../../context/storeContext";
+import storeContext from "../../../context/storeContext";
 
 const AdminIndex = () => {
   const navigate = useNavigate();

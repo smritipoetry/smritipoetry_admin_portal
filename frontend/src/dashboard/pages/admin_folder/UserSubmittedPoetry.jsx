@@ -1,7 +1,7 @@
 import React, { useContext } from "react";
 import { Link } from "react-router-dom";
-import PoetryContentUser from "../components/PoetryContentUser";
-import storeContext from "../../context/storeContext";
+import PoetryContentUser from "../../components/PoetryContentUser";
+import storeContext from "../../../context/storeContext";
 
 const Poetry = () => {
   const { store } = useContext(storeContext);

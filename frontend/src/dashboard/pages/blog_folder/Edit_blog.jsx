@@ -1,25 +1,35 @@
 import React, { useContext, useEffect, useRef, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { MdCloudUpload } from "react-icons/md";
 import JoditEditor from "jodit-react";
-import Gallery from "../components/Gallery";
-import { base_url } from "../../config/config";
+import Gallery from "../../components/Gallery";
+import { base_url } from "../../../config/config";
 import axios from "axios";
-import storeContext from "../../context/storeContext";
+import storeContext from "../../../context/storeContext";
 import toast from "react-hot-toast";
 
-const CreatePoetry = () => {
+const Edit_blog = () => {
+  const navigate = useNavigate();
+  const { blog_id } = useParams();
   const { store } = useContext(storeContext);
   const [show, setShow] = useState(false);
   const editor = useRef(null);
 
+  const [old_image, setOldImage] = useState("");
+  const [old_audio, setOldAudio] = useState("");
   const [title, setTitle] = useState("");
-  const [image, setImage] = useState("");
-  const [img, setImg] = useState("");
-  const [description, setDescription] = useState("");
+  const [image, setImage] = useState(null);
   const [audio, setAudio] = useState(null);
+  const [img, setImg] = useState("");
   const [audioPreview, setAudioPreview] = useState("");
+  const [description, setDescription] = useState("");
+  const [loader, setLoader] = useState(false);
+  const [category, setCategory] = useState("");
 
+  const [images, setImages] = useState([]);
+  const [imagesLoader, setImagesLoader] = useState(false);
+
+  // Handle image selection
   const imageHandle = (e) => {
     const { files } = e.target;
     if (files.length > 0) {
@@ -28,6 +38,7 @@ const CreatePoetry = () => {
     }
   };
 
+  // Handle audio selection
   const audioHandle = (e) => {
     const { files } = e.target;
     if (files.length > 0) {
@@ -36,22 +47,23 @@ const CreatePoetry = () => {
     }
   };
 
-  const [loader, setLoader] = useState(false);
-
-  const added = async (e) => {
+  // Submit updated blog
+  const updateBlog = async (e) => {
     e.preventDefault();
     const formData = new FormData();
     formData.append("title", title);
     formData.append("description", description);
-    formData.append("image", image);
-    if (audio) {
-      formData.append("audio", audio);
-    }
+    formData.append("category", category);
+    if (image) formData.append("new_image", image);
+    formData.append("old_image", old_image);
+
+    if (audio) formData.append("new_audio", audio);
+    formData.append("old_audio", old_audio);
 
     try {
       setLoader(true);
-      const { data } = await axios.post(
-        `${base_url}/api/poetry/add`,
+      const { data } = await axios.put(
+        `${base_url}/api/blog/update/${blog_id}`,
         formData,
         {
           headers: {
@@ -61,17 +73,19 @@ const CreatePoetry = () => {
       );
       setLoader(false);
       toast.success(data.message);
+      navigate("/dashboard/blog"); // Redirect after successful update
     } catch (error) {
       setLoader(false);
-      toast.error(error.response?.data?.message || "Something went wrong");
+      const errorMsg = error.response?.data?.message || "An error occurred";
+      toast.error(errorMsg);
     }
   };
 
-  const [images, setImages] = useState([]);
-
+  // Fetch available gallery images
   const get_images = async () => {
+    setImagesLoader(true);
     try {
-      const { data } = await axios.get(`${base_url}/api/images`, {
+      const { data } = await axios.get(`${base_url}/api/blog/images`, {
         headers: {
           Authorization: `Bearer ${store.token}`,
         },
@@ -79,57 +93,48 @@ const CreatePoetry = () => {
       setImages(data.images);
     } catch (error) {
       console.log(error);
+    } finally {
+      setImagesLoader(false);
+    }
+  };
+
+  const get_blog = async () => {
+    try {
+      const { data } = await axios.get(`${base_url}/api/blog/id/${blog_id}`, {
+        headers: { Authorization: `Bearer ${store.token}` },
+      });
+      const blog = data.blog;
+      setTitle(blog.title);
+      setDescription(blog.description);
+      setCategory(blog.category);
+      setImg(blog.image);
+      setOldImage(blog.image);
+      setOldAudio(blog.audio);
+      setAudioPreview(blog.audio);
+    } catch (error) {
+      console.log(error);
     }
   };
 
   useEffect(() => {
     get_images();
-  }, []);
-
-  const [imagesLoader, setImagesLoader] = useState(false);
-
-  const imageHandler = async (e) => {
-    const files = e.target.files;
-    try {
-      const formData = new FormData();
-      for (let i = 0; i < files.length; i++) {
-        formData.append("images", files[i]);
-      }
-
-      setImagesLoader(true);
-
-      const { data } = await axios.post(
-        `${base_url}/api/images/add`,
-        formData,
-        {
-          headers: {
-            Authorization: `Bearer ${store.token}`,
-          },
-        }
-      );
-      setImagesLoader(false);
-      setImages([...images, ...data.images]);
-      toast.success(data.message);
-    } catch (error) {
-      setImagesLoader(false);
-      toast.error(error.response?.data?.message || "Image upload failed");
-    }
-  };
+    get_blog();
+  }, [blog_id]);
 
   return (
     <div className="bg-white rounded-md">
       <div className="flex justify-between p-4">
-        <h2 className="text-xl font-medium">Add Poetry</h2>
+        <h2 className="text-xl font-medium">Edit Blog</h2>
         <Link
-          className="px-3 py-[6px] bg-green-700 rounded-sm text-white hover:bg-green-800"
-          to="/dashboard/poetry"
+          className="px-3 py-[6px] bg-purple-500 rounded-sm text-white hover:bg-purple-600"
+          to="/dashboard/blog"
         >
-          Poetry
+          Blogs
         </Link>
       </div>
 
       <div className="p-4">
-        <form onSubmit={added}>
+        <form onSubmit={updateBlog}>
           {/* Title */}
           <div className="flex flex-col gap-y-2 mb-6">
             <label
@@ -143,14 +148,34 @@ const CreatePoetry = () => {
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               type="text"
-              placeholder="title"
+              placeholder="Title"
               name="title"
               className="px-3 py-2 rounded-md outline-0 border border-gray-300 focus:border-green-500 h-10"
               id="title"
             />
           </div>
 
-          {/* Image Upload */}
+          {/* Category */}
+          <div className="flex flex-col gap-y-2 mb-6">
+            <label
+              className="text-md font-medium text-gray-600"
+              htmlFor="category"
+            >
+              Category
+            </label>
+            <input
+              required
+              value={category}
+              onChange={(e) => setCategory(e.target.value)}
+              type="text"
+              placeholder="Category"
+              name="category"
+              className="px-3 py-2 rounded-md outline-0 border border-gray-300 focus:border-green-500 h-10"
+              id="category"
+            />
+          </div>
+
+          {/* Image */}
           <div className="mb-6">
             <label
               htmlFor="img"
@@ -160,7 +185,7 @@ const CreatePoetry = () => {
                 <img
                   src={img}
                   className="w-full h-full object-cover"
-                  alt="preview"
+                  alt="Selected"
                 />
               ) : (
                 <div className="flex justify-center items-center flex-col gap-y-2">
@@ -172,37 +197,14 @@ const CreatePoetry = () => {
               )}
             </label>
             <input
-              required
               onChange={imageHandle}
               className="hidden"
               type="file"
               id="img"
-              accept="image/*"
             />
           </div>
 
-          {/* Description */}
-          <div className="flex flex-col gap-y-2 mb-6">
-            <div className="flex justify-start items-center gap-x-2">
-              <h2>Description</h2>
-              <div onClick={() => setShow(true)}>
-                <span className="text-2xl cursor-pointer">
-                  <MdCloudUpload />
-                </span>
-              </div>
-            </div>
-            <div>
-              <JoditEditor
-                ref={editor}
-                value={description}
-                tabIndex={1}
-                onBlur={(value) => setDescription(value)}
-                onChange={() => {}}
-              />
-            </div>
-          </div>
-
-          {/* Styled Audio Upload */}
+          {/* Audio */}
           <div className="mb-6">
             <label
               htmlFor="audio"
@@ -222,27 +224,41 @@ const CreatePoetry = () => {
               )}
             </label>
             <input
-              type="file"
-              id="audio"
               onChange={audioHandle}
               className="hidden"
-              accept="audio/*"
+              type="file"
+              id="audio"
             />
           </div>
 
+          {/* Description */}
+          <div className="flex flex-col gap-y-2 mb-6">
+            <h2>Description</h2>
+            <div>
+              <JoditEditor
+                ref={editor}
+                value={description}
+                tabIndex={1}
+                onBlur={(value) => setDescription(value)}
+              />
+            </div>
+          </div>
+
+          {/* Submit */}
           <div className="mt-4">
             <button
               disabled={loader}
-              className="px-3 py-[6px] bg-green-700 rounded-sm text-white hover:bg-green-800"
+              className="px-3 py-[6px] bg-purple-500 rounded-sm text-white hover:bg-purple-600"
             >
-              {loader ? "loading..." : "Add Poetry"}
+              {loader ? "Loading..." : "Update Blog"}
             </button>
           </div>
         </form>
       </div>
 
+      {/* Hidden input for gallery images */}
       <input
-        onChange={imageHandler}
+        onChange={imageHandle}
         type="file"
         multiple
         id="images"
@@ -253,4 +269,4 @@ const CreatePoetry = () => {
   );
 };
 
-export default CreatePoetry;
+export default Edit_blog;

@@ -2,8 +2,8 @@ import React, { useContext, useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { FaEye, FaTrash } from "react-icons/fa";
 import axios from "axios";
-import { base_url } from "../../config/config";
-import storeContext from "../../context/storeContext";
+import { base_url } from "../../../config/config";
+import storeContext from "../../../context/storeContext";
 import toast from "react-hot-toast";
 
 const Writers = () => {
